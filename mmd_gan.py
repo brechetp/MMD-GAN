@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # encoding: utf-8
 
-
 import argparse
 import random
 import torch
@@ -21,7 +20,6 @@ import numpy as np
 import base_module
 from mmd import mix_rbf_mmd2
 
-
 # NetG is a decoder
 # input: batch_size * nz * 1 * 1
 # output: batch_size * nc * image_size * image_size
@@ -33,7 +31,6 @@ class NetG(nn.Module):
     def forward(self, input):
         output = self.decoder(input)
         return output
-
 
 # NetD is an encoder + decoder
 # input: batch_size * nc * image_size * image_size
@@ -53,7 +50,6 @@ class NetD(nn.Module):
         f_dec_X = f_dec_X.view(input.size(0), -1)
         return f_enc_X, f_dec_X
 
-
 class ONE_SIDED(nn.Module):
     def __init__(self):
         super(ONE_SIDED, self).__init__()
@@ -65,7 +61,6 @@ class ONE_SIDED(nn.Module):
         output = self.main(-input)
         output = -output.mean()
         return output
-
 
 # Get argument
 parser = argparse.ArgumentParser()
@@ -138,7 +133,6 @@ lambda_MMD = 1.0
 lambda_AE_X = 8.0
 lambda_AE_Y = 8.0
 lambda_rg = 16.0
-
 
 time = timeit.default_timer()
 gen_iterations = 0
@@ -243,10 +237,10 @@ for t in range(args.max_iter):
         run_time = (timeit.default_timer() - time) / 60.0
         print('[%3d/%3d][%3d/%3d] [%5d] (%.2f m) MMD2_D %.6f hinge %.6f L2_AE_X %.6f L2_AE_Y %.6f loss_D %.6f Loss_G %.6f f_X %.6f f_Y %.6f |gD| %.4f |gG| %.4f'
               % (t, args.max_iter, i, len(trn_loader), gen_iterations, run_time,
-                 mmd2_D.data[0], one_side_errD.data[0],
-                 L2_AE_X_D.data[0], L2_AE_Y_D.data[0],
-                 errD.data[0], errG.data[0],
-                 f_enc_X_D.mean().data[0], f_enc_Y_D.mean().data[0],
+                 mmd2_D.data.item(), one_side_errD.data.item(),
+                 L2_AE_X_D.data.item(), L2_AE_Y_D.data.item(),
+                 errD.data.item(), errG.data.item(),
+                 f_enc_X_D.mean().data.item(), f_enc_Y_D.mean().data.item(),
                  base_module.grad_norm(netD), base_module.grad_norm(netG)))
 
         if gen_iterations % 500 == 0:
