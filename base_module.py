@@ -3,7 +3,6 @@
 
 import torch.nn as nn
 
-
 # input: batch_size * nc * 64 * 64
 # output: batch_size * k * 1 * 1
 class Encoder(nn.Module):
@@ -13,25 +12,25 @@ class Encoder(nn.Module):
 
         # input is nc x isize x isize
         main = nn.Sequential()
-        main.add_module('initial.conv.{0}-{1}'.format(nc, ndf),
+        main.add_module('initial_conv_{0}-{1}'.format(nc, ndf),
                         nn.Conv2d(nc, ndf, 4, 2, 1, bias=False))
-        main.add_module('initial.relu.{0}'.format(ndf),
+        main.add_module('initial_relu_{0}'.format(ndf),
                         nn.LeakyReLU(0.2, inplace=True))
         csize, cndf = isize / 2, ndf
 
         while csize > 4:
             in_feat = cndf
             out_feat = cndf * 2
-            main.add_module('pyramid.{0}-{1}.conv'.format(in_feat, out_feat),
+            main.add_module('pyramid_{0}-{1}_conv'.format(in_feat, out_feat),
                             nn.Conv2d(in_feat, out_feat, 4, 2, 1, bias=False))
-            main.add_module('pyramid.{0}.batchnorm'.format(out_feat),
+            main.add_module('pyramid_{0}_batchnorm'.format(out_feat),
                             nn.BatchNorm2d(out_feat))
-            main.add_module('pyramid.{0}.relu'.format(out_feat),
+            main.add_module('pyramid-{0}-relu'.format(out_feat),
                             nn.LeakyReLU(0.2, inplace=True))
             cndf = cndf * 2
             csize = csize / 2
 
-        main.add_module('final.{0}-{1}.conv'.format(cndf, 1),
+        main.add_module('final_{0}-{1}_conv'.format(cndf, 1),
                         nn.Conv2d(cndf, k, 4, 1, 0, bias=False))
 
         self.main = main
@@ -39,7 +38,6 @@ class Encoder(nn.Module):
     def forward(self, input):
         output = self.main(input)
         return output
-
 
 # input: batch_size * k * 1 * 1
 # output: batch_size * nc * image_size * image_size
@@ -54,23 +52,23 @@ class Decoder(nn.Module):
             tisize = tisize * 2
 
         main = nn.Sequential()
-        main.add_module('initial.{0}-{1}.convt'.format(k, cngf), nn.ConvTranspose2d(k, cngf, 4, 1, 0, bias=False))
-        main.add_module('initial.{0}.batchnorm'.format(cngf), nn.BatchNorm2d(cngf))
-        main.add_module('initial.{0}.relu'.format(cngf), nn.ReLU(True))
+        main.add_module('initial_{0}-{1}_convt'.format(k, cngf), nn.ConvTranspose2d(k, cngf, 4, 1, 0, bias=False))
+        main.add_module('initial_{0}_batchnorm'.format(cngf), nn.BatchNorm2d(cngf))
+        main.add_module('initial_{0}_relu'.format(cngf), nn.ReLU(True))
 
         csize = 4
         while csize < isize // 2:
-            main.add_module('pyramid.{0}-{1}.convt'.format(cngf, cngf // 2),
+            main.add_module('pyramid_{0}-{1}_convt'.format(cngf, cngf // 2),
                             nn.ConvTranspose2d(cngf, cngf // 2, 4, 2, 1, bias=False))
-            main.add_module('pyramid.{0}.batchnorm'.format(cngf // 2),
+            main.add_module('pyramid_{0}_batchnorm'.format(cngf // 2),
                             nn.BatchNorm2d(cngf // 2))
-            main.add_module('pyramid.{0}.relu'.format(cngf // 2),
+            main.add_module('pyramid_{0}_relu'.format(cngf // 2),
                             nn.ReLU(True))
             cngf = cngf // 2
             csize = csize * 2
 
-        main.add_module('final.{0}-{1}.convt'.format(cngf, nc), nn.ConvTranspose2d(cngf, nc, 4, 2, 1, bias=False))
-        main.add_module('final.{0}.tanh'.format(nc),
+        main.add_module('final_{0}-{1}_convt'.format(cngf, nc), nn.ConvTranspose2d(cngf, nc, 4, 2, 1, bias=False))
+        main.add_module('final_{0}_tanh'.format(nc),
                         nn.Tanh())
 
         self.main = main
@@ -79,7 +77,6 @@ class Decoder(nn.Module):
         output = self.main(input)
         return output
 
-
 def grad_norm(m, norm_type=2):
     total_norm = 0.0
     for p in m.parameters():
@@ -87,7 +84,6 @@ def grad_norm(m, norm_type=2):
         total_norm += param_norm ** norm_type
     total_norm = total_norm ** (1. / norm_type)
     return total_norm
-
 
 def weights_init(m):
     classname = m.__class__.__name__
