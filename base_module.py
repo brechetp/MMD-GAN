@@ -3,6 +3,7 @@
 
 import torch.nn as nn
 
+
 # input: batch_size * nc * 64 * 64
 # output: batch_size * k * 1 * 1
 class Encoder(nn.Module):
@@ -38,6 +39,7 @@ class Encoder(nn.Module):
     def forward(self, input):
         output = self.main(input)
         return output
+
 
 # input: batch_size * k * 1 * 1
 # output: batch_size * nc * image_size * image_size
@@ -77,6 +79,7 @@ class Decoder(nn.Module):
         output = self.main(input)
         return output
 
+
 def grad_norm(m, norm_type=2):
     total_norm = 0.0
     for p in m.parameters():
@@ -84,6 +87,7 @@ def grad_norm(m, norm_type=2):
         total_norm += param_norm ** norm_type
     total_norm = total_norm ** (1. / norm_type)
     return total_norm
+
 
 def weights_init(m):
     classname = m.__class__.__name__
