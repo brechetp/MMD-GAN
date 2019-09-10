@@ -10,7 +10,6 @@ from PIL import Image
 from os import listdir
 from os.path import join
 
-
 def get_args(parser):
     parser.add_argument('--dataset', required=True, help='mnist | cifar10 | cifar100 | lsun | imagenet | folder | lfw ')
     parser.add_argument('--dataroot', required=True, help='path to dataset')
@@ -28,15 +27,12 @@ def get_args(parser):
     parser.add_argument('--experiment', default=None, help='Where to store samples and models')
     return parser
 
-
 def is_image_file(filename):
     return any(filename.endswith(extension) for extension in [".png", ".jpg", ".jpeg"])
-
 
 def load_img(filepath):
     img = Image.open(filepath).convert('RGB')
     return img
-
 
 class FolderWithImages(data.Dataset):
     def __init__(self, root, input_transform=None, target_transform=None):
@@ -60,11 +56,9 @@ class FolderWithImages(data.Dataset):
     def __len__(self):
         return len(self.image_filenames)
 
-
 class ALICropAndScale(object):
     def __call__(self, img):
         return img.resize((64, 78), Image.ANTIALIAS).crop((0, 7, 64, 64 + 7))
-
 
 def get_data(args, train_flag=True):
     transform = transforms.Compose([
@@ -72,7 +66,7 @@ def get_data(args, train_flag=True):
         transforms.CenterCrop(args.image_size),
         transforms.ToTensor(),
         transforms.Normalize(
-            (0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
+            args.nc*(0.5,), args.nc*(0.5,)),
     ])
 
     if args.dataset in ['imagenet', 'folder', 'lfw']:
@@ -121,10 +115,8 @@ def get_data(args, train_flag=True):
         raise ValueError("Unknown dataset %s" % (args.dataset))
     return dataset
 
-
 def normalize(x, dim=1):
     return x.div(x.norm(2, dim=dim).expand_as(x))
-
 
 def match(x, y, dist):
     '''
