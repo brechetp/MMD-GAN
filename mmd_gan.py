@@ -243,10 +243,10 @@ for t in range(args.max_iter):
         run_time = (timeit.default_timer() - time) / 60.0
         print('[%3d/%3d][%3d/%3d] [%5d] (%.2f m) MMD2_D %.6f hinge %.6f L2_AE_X %.6f L2_AE_Y %.6f loss_D %.6f Loss_G %.6f f_X %.6f f_Y %.6f |gD| %.4f |gG| %.4f'
               % (t, args.max_iter, i, len(trn_loader), gen_iterations, run_time,
-                 mmd2_D.data[0], one_side_errD.data[0],
-                 L2_AE_X_D.data[0], L2_AE_Y_D.data[0],
-                 errD.data[0], errG.data[0],
-                 f_enc_X_D.mean().data[0], f_enc_Y_D.mean().data[0],
+                 mmd2_D.data.item(), one_side_errD.data.item(),
+                 L2_AE_X_D.data.item(), L2_AE_Y_D.data.item(),
+                 errD.data.item(), errG.data.item(),
+                 f_enc_X_D.mean().data.item(), f_enc_Y_D.mean().data.item(),
                  base_module.grad_norm(netD), base_module.grad_norm(netG)))
 
         if gen_iterations % 500 == 0:
