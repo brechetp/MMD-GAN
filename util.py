@@ -72,7 +72,7 @@ def get_data(args, train_flag=True):
         transforms.CenterCrop(args.image_size),
         transforms.ToTensor(),
         transforms.Normalize(
-            (0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
+            args.nc*(0.5,), args.nc*(0.5,)),
     ])
 
     if args.dataset in ['imagenet', 'folder', 'lfw']:
